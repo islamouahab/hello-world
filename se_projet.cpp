@@ -7,7 +7,6 @@ using namespace std;
 using std::string;
 
 
-
 class node{
     public:
     int num_pross,tmp_arr,tmp_att,tmp_exe,tmp_sort,id;
