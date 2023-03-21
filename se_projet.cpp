@@ -7,7 +7,7 @@ using namespace std;
 using std::string;
 
 
-/*this is where i made the change*/
+
 class node{
     public:
     int num_pross,tmp_arr,tmp_att,tmp_exe,tmp_sort,id;
@@ -183,7 +183,6 @@ int main(){
     }
     }
 cout<<"terminer !";
-int neww;
 
 
 
