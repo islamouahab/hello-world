@@ -9,11 +9,12 @@ using std::string;
 
 class node{
     public:
-    int num_pross,tmp_att,tmp_exe,tmp_sort,id;
+    int num_pross,tmp_att,tmp_exe,tmp_sort,id,tmp_perdu;
+    time_t tmp_sec;
     struct tm tmp_arr;
     string etat;
     node *next;
-    node(int id,struct tm tmp_arr,int unit_calcul){
+    node(int id,struct tm tmp_arr,int unit_calcul,time_t t){
         this->tmp_att=0;
         this->tmp_arr=tmp_arr;
         this->tmp_sort=0;
@@ -21,6 +22,8 @@ class node{
         this->num_pross=1+(rand()%100);
         this->etat="P";
         this->tmp_exe=unit_calcul;
+        this->tmp_perdu=0;
+        this->tmp_sec=t;
     }
     int getId(){
         return this->id;
@@ -72,7 +75,7 @@ void check(file *f){
     file F = *f;
     system("CLS");
     while(F.head){
-        cout<<"etat de processus "<<F.head->getId()<<" : "<<F.head->getEtat()<<"      le temp d'arrive : "<<F.head->tmp_arr.tm_hour<<":"<<F.head->tmp_arr.tm_min<<":"<<F.head->tmp_arr.tm_sec<<"seconds"<<endl;
+        cout<<"etat de processus "<<F.head->getId()<<" : "<<F.head->getEtat()<<"      le temp d'arrive : "<<F.head->tmp_arr.tm_hour<<":"<<F.head->tmp_arr.tm_min<<":"<<F.head->tmp_arr.tm_sec<<endl;
         F.head=F.head->next;
      }
      system("pause");
@@ -113,10 +116,37 @@ void etat(file *f){
     cout<<"le temp moyen d'attente : "<<temp_arrive/count<<" seconds"<<endl;
 
 }
-
+void new_stat(file *f,int total,time_t t){
+    file F = *f;
+    time_t diff_time=F.head->tmp_sec-t;
+    int i=0;
+    while(i<diff_time){
+            cout<<"/"<<" ";
+            i++;
+         }
+    while(total-diff_time>0){
+         cout<<F.head->getEtat()<<" ";
+         total--;
+    }
+}
+void new_etat(file *f){
+    int total=0;
+    time_t time=f->head->tmp_sec;
+    while (f->head){ 
+        node *rem=defiler(f);
+        total+=rem->tmp_exe;
+        while (rem->tmp_exe>0){
+            cout<<rem->getEtat()<<" ";
+            rem->tmp_exe--;
+        }
+        cout<<endl;
+        new_stat(f,total,time);
+       
+    }
+}
 
 void executer(file *f){
-     etat(f);
+     new_etat(f);
 
 }
 
@@ -136,7 +166,7 @@ file *cree_file(int id){
         t=time(NULL);
         c=localtime(&t);
         struct tm s=*c;
-        node *n = new node(id,s,tmp);
+        node *n = new node(id,s,tmp,t);
         enfiler(n,f);
         i++;
         id++;
