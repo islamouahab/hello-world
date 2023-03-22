@@ -119,6 +119,7 @@ void etat(file *f){
 void new_stat(file *f,int total,time_t t){
     file F = *f;
     time_t diff_time=F.head->tmp_sec-t;
+    F.head->tmp_att=total;
     int i=0;
     while(i<diff_time){
             cout<<"/"<<" ";
@@ -130,19 +131,24 @@ void new_stat(file *f,int total,time_t t){
     }
 }
 void new_etat(file *f){
-    int total=0;
+    int total=0,count=0;
+    float total_att=0;
     time_t time=f->head->tmp_sec;
     while (f->head){ 
         node *rem=defiler(f);
         total+=rem->tmp_exe;
+        total_att+=rem->tmp_att;
         while (rem->tmp_exe>0){
             cout<<rem->getEtat()<<" ";
             rem->tmp_exe--;
         }
         cout<<endl;
+        if (f->head)
         new_stat(f,total,time);
+        count++;
        
     }
+    cout<<"le temps moyen d'attent est : "<<total_att/count<<" uc"<<endl;
 }
 
 void executer(file *f){
