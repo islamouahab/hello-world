@@ -6,7 +6,7 @@
 using namespace std;
 using std::string;
 
-
+int init_batch(void);
 class node{
     public:
     int num_pross,tmp_att,tmp_exe,tmp_sort,id,tmp_perdu;
@@ -68,7 +68,15 @@ node *defiler(file *f){
     f->head=f->head->next;
     return tmp;
 }
+node *defiler_t(file *f){
+    node *tmp=f->head;
+    if (tmp->tmp_exe>0){
+    f->head=f->head->next;
+    f->tail->next=tmp;
+    tmp->next=NULL;
+    }
 
+}
 
 void check(file *f){
     if (f){
@@ -87,36 +95,7 @@ void check(file *f){
     }
 }
 
-
-void stat(file *f){
-    if (f){
-    file F = *f;
-    while(F.head){
-        cout<<"etat de processus "<<F.head->getId()<<" : "<<F.head->getEtat()<<"      le temp d'arrive : "<<F.head->tmp_arr.tm_hour<<":"<<F.head->tmp_arr.tm_min<<":"<<F.head->tmp_arr.tm_sec<<"seconds"<<endl;
-        F.head=F.head->next;
-     }
-    }
-}
-
-
-void etat(file *f){
-    int temp_arrive=0,count=0;
-    while(f->head){
-     node *rem=defiler(f);
-     /*rem->tmp_arr=temp_arrive;*/
-     system("CLS");
-     cout<<"etat de processus "<<rem->getId()<<" : "<<rem->getEtat()<<"      le temp d'arrive : "<<rem->tmp_arr.tm_hour<<":"<<rem->tmp_arr.tm_min<<":"<<rem->tmp_arr.tm_sec<<"seconds"<<endl;
-     stat(f);
-     cout<<"le temp rest pour le processus actif : "<<rem->getTemp()<<" seconds";
-     sleep(rem->getTemp());
-     /*temp_arrive+=rem->getTemp();*/
-     count++;
-    }
-    system("CLS");
-    cout<<"le temp moyen d'attente : "<<temp_arrive/count<<" seconds"<<endl;
-
-}
-void new_stat(file *f,int total,time_t t){
+void stat(file *f,int total,time_t t){
     file F = *f;
     time_t diff_time=F.head->tmp_sec-t;
     F.head->tmp_att=total;
@@ -130,7 +109,7 @@ void new_stat(file *f,int total,time_t t){
          total--;
     }
 }
-void new_etat(file *f){
+void etat(file *f){
     int total=0,count=0;
     float total_att=0;
     time_t time=f->head->tmp_sec;
@@ -144,7 +123,7 @@ void new_etat(file *f){
         }
         cout<<endl;
         if (f->head)
-        new_stat(f,total,time);
+        stat(f,total,time);
         count++;
        
     }
@@ -152,7 +131,8 @@ void new_etat(file *f){
 }
 
 void executer(file *f){
-     new_etat(f);
+    system("CLS");
+     etat(f);
 
 }
 
@@ -184,45 +164,33 @@ file *cree_file(int id){
 }
 
 
-int init(){
-    int temp;
-    cout<<"ce program support just la politique FIFO en mode batch"<<endl;
+int init_batch(){
+    int temp,id=0;bool terminer=false;
+    file *f = NULL;
+    while(!terminer){
+    system("CLS");
     cout<<"Menu:"<<endl;
     cout<<"1.inserer un processus"<<endl;
     cout<<"2.consulter la file d'attente"<<endl;
     cout<<"3.executer la sequence des processus"<<endl;
     cin>>temp;
-    return temp;
-}
-
-
-int main(){
-    int choix,id=0;
-    bool error = false,terminer=false;
-    file *f= NULL;
-        system("CLS");
-        choix=init();
-    switch(choix){
+    switch(temp){
         case 1 : id++ ;f=cree_file(id);
         break;
         case 2 : check(f);
         break;
-        case 3 : executer(f);
+        case 3 : executer(f); terminer=true;
         break;
-        default : error = true;
+        default : init_batch();
     }
-    while(error || !terminer){
-        system("CLS");
-         choix=init();
-    switch(choix){
-        case 1 : id++; f=cree_file(id); error=false;
-        break;
-        case 2 : check(f);
-        break;
-        case 3 : executer(f); terminer = true;
-        break;
-    }
-    }
+}
+}
+
+
+
+int main(){
+
+init_batch();
 cout<<"terminer !";
 
 
